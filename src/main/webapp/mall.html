@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商场管理</title>
+
+
+</head>
+<body>
+
+<div id="app">
+
+    <br>
+
+    <!--搜索表单-->
+    <el-form :inline="true" :model="mall1" class="demo-form-inline">
+        <el-form-item label="所在城市">
+            <el-select v-model="mall1.addr" placeholder="所在城市">
+                <el-option label="上海" value="上海"></el-option>
+                <el-option label="北京" value="北京"></el-option>
+                <el-option label="石家庄" value="石家庄"></el-option>
+                <el-option label="深圳" value="深圳"></el-option>
+                <el-option label="西安" value="西安"></el-option>
+                <el-option label="武汉" value="武汉"></el-option>
+                <el-option label="南京" value="南京"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="商场名称">
+            <el-input v-model="mall1.name" placeholder="商场名称"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="onSubmit">搜索</el-button>
+        </el-form-item>
+    </el-form>
+
+    <!--新增按钮-->
+    <el-row>
+        <el-button type="primary" plain icon="el-icon-circle-plus" @click="dialogVisible = true">新增</el-button>
+    </el-row>
+    <br>
+    <!--添加数据的对话框表单-->
+    <el-dialog
+            title="新增商场"
+            :visible.sync="dialogVisible"
+            width="30%">
+        <span>
+
+            <el-form ref="form" :model="mall2" label-width="80px">
+
+                <el-form-item label="商场编号">
+                    <el-input v-model="mall2.id"></el-input>
+                </el-form-item>
+
+                <el-form-item label="商场名称">
+                    <el-input v-model="mall2.name"></el-input>
+                </el-form-item>
+
+                <el-form-item label="地址">
+                    <el-input v-model="mall2.addr"></el-input>
+                </el-form-item>
+
+                <el-form-item label="联系电话">
+                    <el-input v-model="mall2.tel"></el-input>
+                </el-form-item>
+
+              <el-form-item>
+                <el-button type="primary" @click="addMall">确定</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+              </el-form-item>
+            </el-form>
+
+        </span>
+
+    </el-dialog>
+
+    <!--表格-->
+    <template>
+        <el-table
+                :data="tableData"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    prop="id"
+                    label="商场编号"
+                    align="center"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="name"
+                    label="商场名称"
+                    align="center"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="addr"
+                    label="地址"
+                    align="center">
+            </el-table-column>
+            <el-table-column
+                    prop="tel"
+                    label="联系电话"
+                    align="center">
+            </el-table-column>
+
+            <el-table-column
+                    label="操作"
+                    align="center">
+                <template slot-scope="scope">
+
+                    <el-button plain @click="gotoDepartment(scope.$index, scope.row)">查看详情</el-button>
+                    <el-button type="primary" plain icon="el-icon-edit" @click="updateDialog(scope.$index, scope.row)">编辑</el-button>
+                    <el-button type="danger" plain icon="el-icon-delete" @click="dialogVisibleOfDelete = true">删除</el-button>
+
+                    <!--修改数据的对话框表单-->
+                    <el-dialog title="修改" :visible.sync="dialogVisibleOfUpdate" width="30%">
+                        <span>
+
+                            <el-form ref="form" :model="mall3" label-width="80px">
+
+                                <el-form-item label="商场编号">
+                                    <el-input
+                                            placeholder="请输入内容"
+                                            v-model="mall3.id"
+                                            :disabled="true">
+                                    </el-input>
+                                    <!--<el-input v-model="mall3.id"></el-input>-->
+                                </el-form-item>
+
+                                <el-form-item label="商场名称">
+                                    <el-input v-model="mall3.name"></el-input>
+                                </el-form-item>
+
+                                <el-form-item label="地址" align="left">
+                                    <el-input v-model="mall3.addr"></el-input>
+                                </el-form-item>
+
+                                <el-form-item label="联系电话">
+                                    <el-input v-model="mall3.tel"></el-input>
+                                </el-form-item>
+
+                                <el-form-item>
+                                    <el-button type="primary" @click="updateMall()">确定</el-button>
+                                    <el-button @click="dialogVisibleOfUpdate = false">取消</el-button>
+                                </el-form-item>
+                            </el-form>
+
+                        </span>
+
+                    </el-dialog>
+                    <!--删除数据的对话框-->
+                    <el-dialog title="提示" :visible.sync="dialogVisibleOfDelete" width="30%" >
+                        <span>确认删除？</span>
+                        <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogVisibleOfDelete = false">取 消</el-button>
+                            <el-button type="danger" @click="deleteById(scope.$index, scope.row)">删 除</el-button>
+                        </span>
+                    </el-dialog>
+
+                </template>
+
+            </el-table-column>
+        </el-table>
+    </template>
+    <br>
+
+    <!--分页工具栏-->
+    <el-pagination
+            align="center"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[10, 15, 20]"
+            :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalCount">
+    </el-pagination>
+
+
+</div>
+
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+
+<script>
+
+    new Vue({
+        el: "#app",
+        mounted() {
+
+            //当页面加载完成后，发送异步请求，加载数据
+            this.selectAll();
+
+        },
+        methods: {
+
+            //查询分页数据方法
+            selectAll() {
+                var _this = this;
+                //当页面加载完成后，发送异步请求，加载数据
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/mallmanagement/mall/selectByPageAndCondition?currentPage=" + _this.currentPage + "&pageSize=" + _this.pageSize,
+                    data: this.mall1
+                }).then(function (resp) {
+                    //设置表格数据
+                    _this.tableData = resp.data.rows;
+                    //设置总记录数
+                    _this.totalCount = resp.data.totalCount;
+                })
+            },
+
+            //表单查询方法
+            onSubmit() {
+                //console.log(this.mall);
+                this.selectAll();
+            },
+
+            //修改商场方法
+            updateMall() {
+
+                var _this = this;
+                //发送ajax异步请求，添加数据
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/mallmanagement/mall/update",
+                    data: _this.mall3
+                }).then(function (resp) {
+                    if (resp.data == "success") {
+                        //修改成功
+                        //关闭窗口
+                        _this.dialogVisibleOfUpdate = false;
+                        //重新查询数据
+                        _this.selectAll();
+                        //弹出成功提示框
+                        _this.$message({
+                            message: '修改成功',
+                            type: 'success'
+                        });
+                    }
+                })
+
+            },
+
+            //添加数据方法
+            addMall() {
+                //console.log(this.mall);
+                var _this = this;
+                //发送ajax异步请求，添加数据
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/mallmanagement/mall/add",
+                    data: _this.mall2
+                }).then(function (resp) {
+                    if (resp.data == "success") {
+                        //添加成功
+                        //关闭窗口
+                        _this.dialogVisible = false;
+                        //重新查询数据
+                        _this.selectAll();
+                        //弹出成功提示框
+                        _this.$message({
+                            message: '添加成功',
+                            type: 'success'
+                        });
+                    }
+                })
+            },
+
+            //删除数据方法
+            deleteById(index, row) {
+                //弹出删除确认框
+                this.dialogVisibleOfDelete = true;
+                //console.log(row.id);
+                var _this = this;
+                //发送ajax异步请求，添加数据
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/mallmanagement/mall/deleteById",
+                    data: row.id
+                }).then(function (resp) {
+                    if (resp.data == "success") {
+                        console.log(resp.data);
+                        //删除成功
+                        //关闭窗口
+                        _this.dialogVisibleOfDelete = false;
+                        //重新查询数据
+                        _this.selectAll();
+                        //弹出成功提示框
+                        _this.$message({
+                            message: '删除成功',
+                            type: 'success'
+                        });
+                    }
+                })
+            },
+
+            //修改表单时，让需要修改的那一行数据回显到表单中
+            updateDialog(index, row){
+                this.dialogVisibleOfUpdate = true;
+                this.mall3.id = row.id;
+                this.mall3.name = row.name;
+                this.mall3.addr = row.addr;
+                this.mall3.tel = row.tel;
+                //console.log(row.id);
+
+            },
+
+            //跳转到department.html
+            gotoDepartment(index, row){
+                var _this = this;
+                //发送ajax异步请求，添加数据
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/mallmanagement/mall/gotoDepartment",
+                    data: row.id
+                }).then(function (resp) {
+                    if (resp.data == "success") {
+                        console.log(resp.data);
+                        window.open('http://localhost:8080/mallmanagement/department.html', '_self')
+                    }
+
+
+                })
+            },
+            
+            //分页
+            handleSizeChange(val) {
+                //console.log(`每页 ${val} 条`);
+                this.pageSize = val;
+                this.selectAll();
+            },
+            handleCurrentChange(val) {
+                //console.log(`当前页: ${val}`);
+                this.currentPage = val;
+                this.selectAll();
+            }
+        },
+        data() {
+            return {
+
+                //每页显示条数
+                pageSize: 10,
+
+                //总记录数
+                totalCount: 100,
+
+                //当前页码
+                currentPage: 1,
+
+                //添加数据的对话框"是否展示"的标记
+                dialogVisible: false,
+                dialogVisibleOfUpdate: false,
+                dialogVisibleOfDelete: false,
+
+                //商场模型数据
+                mall1: {
+                    id: "",
+                    name: "",
+                    addr: "",
+                    tel: ""
+                },
+
+                mall2: {
+                    id: "",
+                    name: "",
+                    addr: "",
+                    tel: ""
+                },
+
+                mall3: {
+                    id: "",
+                    name: "",
+                    addr: "",
+                    tel: ""
+                },
+
+                malls: [],
+
+                //表格的数据
+                tableData: [{
+                    id: '001',
+                    name: '万达',
+                    addr: '上海市普陀区金沙江路 1518 弄',
+                    tel: '001'
+                }, {
+                    id: '001',
+                    name: '万达',
+                    addr: '上海市普陀区金沙江路 1518 弄',
+                    tel: '001'
+                }, {
+                    id: '001',
+                    name: '万达',
+                    addr: '上海市普陀区金沙江路 1518 弄',
+                    tel: '001'
+                }, {
+                    id: '001',
+                    name: '万达',
+                    addr: '上海市普陀区金沙江路 1518 弄',
+                    tel: '001'
+                }]
+
+            }
+        }
+    })
+
+</script>
+
+</body>
+</html>

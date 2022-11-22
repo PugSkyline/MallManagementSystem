@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xdu.mapper.MallMapper">
+
+
+    <select id="selectByPageAndCondition" resultType="com.xdu.pojo.Mall">
+        select *
+        from tb_mall
+        <where>
+            <if test="mall.name != null and mall.name != '' ">
+                and name like #{mall.name}
+            </if>
+            <if test="mall.addr != null and mall.addr != '' ">
+                and addr like #{mall.addr}
+            </if>
+        </where>
+        limit #{begin}, #{size}
+    </select>
+
+    <select id="selectTotalCountByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from tb_mall
+        <where>
+            <if test="name != null and name != '' ">
+                and name like #{name}
+            </if>
+            <if test="addr != null and addr != '' ">
+                and addr like #{addr}
+            </if>
+        </where>
+    </select>
+</mapper>

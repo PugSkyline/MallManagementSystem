@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/src/main/java/com/xdu/mapper/DepartmentMapper.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/xdu/mapper/EmployeeMapper.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/xdu/mapper/MallMapper.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/com/xdu/mapper/DepartmentMapper.xml" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/com/xdu/mapper/EmployeeMapper.xml" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/com/xdu/mapper/MallMapper.xml" dialect="MySQL" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ddf3a2f3-d806-47b4-907b-72e329983c28/console.sql" dialect="MySQL" />
+  </component>
+</project>
